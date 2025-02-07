@@ -1,6 +1,6 @@
 # UrbanVue3D
 
-![UrbanVue3D](app-images\app.png)  
+![UrbanVue3D](app-images/app.png)  
 **An interactive 3D visualization platform for rooftop segmentation and building height exploration in Ben Guerir City, Morocco.**
 
 ## 🚀 About UrbanVue3D
@@ -22,7 +22,7 @@ UrbanVue3D is a full-stack web application that enables users to visualize and a
 ## 7. Detailed Overview of UrbanVue3D Application Pages
 
 ### 7.1. Dashboard
-![Dashboard](app-images\app1.png)
+![Dashboard](app-images/app1.png)
 
 ### Overview
 The **UrbanVue3D Dashboard** is a comprehensive web application built using **React.js, Django, Leaflet, and Mapbox**. It serves as the primary interface for visualizing **3D urban models** and managing various aspects of the project.
@@ -56,7 +56,7 @@ The **UrbanVue3D Dashboard** is a comprehensive web application built using **Re
 ---
 
 ## 7.2. Leaflet Page
-![leaflet](app-images\app2.png)
+![leaflet](app-images/app2.png)
 
 
 ### Components and Features
@@ -94,7 +94,7 @@ The **UrbanVue3D Dashboard** is a comprehensive web application built using **Re
 ---
 
 ## 7.3. Mapbox Page
-![mapbox](app-images\app3.png)
+![mapbox](app-images/app3.png)
 
 ### Overview
 The **Mapbox page** provides an immersive **3D urban visualization**, built using **Mapbox GL JS**. This page enhances understanding of **urban form, shading effects, and solar potential**.
@@ -138,7 +138,7 @@ The **Mapbox page** provides an immersive **3D urban visualization**, built usin
 ---
 
 ## 7.4. Papers Page
-![papers](app-images\app4.png)
+![papers](app-images/app4.png)
 
 ### Overview
 The **Papers page** acts as a **research portfolio**, showcasing **publications, methodologies, and urban energy studies** related to UrbanVue3D.
