@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Mapbox 3D Map with Building Heights Legend</title>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+        /* Style for the search field */
+        .mapboxgl-ctrl-geocoder {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 300px; /* Adjust width as needed */
+            max-width: calc(100% - 20px); /* Ensure it doesn’t overflow the map */
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+        }
+        .mapboxgl-ctrl-geocoder--input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .suggestions {
+            border-radius: 0 0 4px 4px;
+            overflow: hidden;
+        }
+
+        /* Style for the legend */
+        #legend {
+            position: absolute;
+            bottom: 30px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+        #legend h4 {
+            margin: 0 0 10px;
+            font-size: 14px;
+        }
+        #legend div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        #legend div span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
+        /* Style for popup */
+        .popup {
+            position: absolute;
+            display: none;
+            background-color: rgb(106, 121, 126);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+            z-index: 999;
+        }
+        .popup button {
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+    </style>
+    <!-- Mapbox GL JS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <!-- Mapbox GL Geocoder -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' rel='stylesheet' />
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Legend HTML -->
+    <div id="legend">
+        <h4>Building Heights</h4>
+        <div><span style="background-color: #a4b000;"></span>0-10 meters</div>
+        <div><span style="background-color: #E8553D;"></span>10-20 meters</div>
+        <div><span style="background-color: #e75805;"></span>20-30 meters</div>
+        <div><span style="background-color: #620033;"></span>30+ meters</div>
+    </div>
+
+    <!-- Popup HTML -->
+    <div id="popup" class="popup">
+        <p id="coordinates"></p>
+        <button id="copyButton">Copy Coordinates</button>
+    </div>
+
+
+    <script>
+        // Mapbox access token
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2FhZGZyaCIsImEiOiJjbHZkdnlrajkwMjl6MmtvNWNxazYwNzZ1In0.XIuSvjAjqxkPVKQZy0R5rw';
+
+        // Initialize map
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            style: 'mapbox://styles/saadfrh/clx8yjlb800j901qs5vpm6ix7', // style URL
+            center: [-8.014056811519197, 31.644846801016328], // starting position [lng, lat]
+            zoom: 15, // starting zoom
+            pitch: 45, // tilt the map
+            bearing: -17.6, // rotate the map
+            antialias: true // create the gl context with MSAA antialiasing, so custom layers are antialiased
+        });
+
+        // Add navigation control (the +/- zoom buttons)
+        map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+        // Initialize the Geocoder
+        const geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl,
+            placeholder: 'Search for places',
+            marker: false // Disable the default marker
+        });
+
+        // Add the Geocoder to the map
+        map.addControl(geocoder);
+
+        // Load 3D buildings
+        map.on('load', function () {
+            // Insert the layer beneath any symbol layer
+            const layers = map.getStyle().layers;
+            const labelLayerId = layers.find(
+                (layer) => layer.type === 'symbol' && layer.layout['text-field']
+            ).id;
+
+            // Add a 3D buildings layer
+            map.addLayer(
+                {
+                    'id': '3d-buildings',
+                    'source': 'composite',
+                    'source-layer': 'building',
+                    'filter': ['==', 'extrude', 'true'],
+                    'type': 'fill-extrusion',
+                    'minzoom': 2,
+                    'paint': {
+                        'fill-extrusion-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['get', 'height'],
+                            0,
+                            '#F28F3B',
+                            3,
+                            '#fafafa',
+                            6,
+                            '#',
+                            12,
+                            '#620033'
+                        ],
+                        'fill-extrusion-height': ['get', 'height'],
+                        'fill-extrusion-base': ['get', 'min_height'],
+                        'fill-extrusion-opacity': 0.6
+                    }
+                },
+                labelLayerId
+            );
+        });
+
+        // Extract coordinates on click
+/*         map.on('click', function (e) {
+            const coordinates = e.lngLat;
+            console.log(`Coordinates: ${coordinates.lng}, ${coordinates.lat}`);
+            alert(`Coordinates: ${coordinates.lng}, ${coordinates.lat}`);
+        }); */
+
+         // Popup for displaying coordinates
+         const popup = new mapboxgl.Popup({
+            closeButton: true,
+            closeOnClick: false
+        });
+
+        // Show coordinates on click and provide copy button
+        map.on('click', function (e) {
+            const coordinates = e.lngLat;
+            popup.setLngLat(coordinates)
+                .setHTML(`<p>Coordinates: ${coordinates.lng}, ${coordinates.lat}</p>`)
+                .addTo(map);
+
+            // Copy button functionality
+            const copyButton = document.getElementById('copyButton');
+            copyButton.onclick = function () {
+                navigator.clipboard.writeText(`${coordinates.lng}, ${coordinates.lat}`);
+                alert('Coordinates copied to clipboard!');
+            };
+        });
+
+    </script>
+</body>
+</html>
