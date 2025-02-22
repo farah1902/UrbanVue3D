@@ -19,9 +19,9 @@ UrbanVue3D is a full-stack web application that enables users to visualize and a
 - **Database**: PostgreSQL (PostGIS for geospatial data)
 - **Deployment**: Docker, Nginx, AWS/GCP (Optional)
 
-## 7. Detailed Overview of UrbanVue3D Application Pages
+## 4. Detailed Overview of UrbanVue3D Application Pages
 
-### 7.1. Dashboard
+### 4.1. Dashboard
 ![Dashboard](app-images/app1.png)
 
 ### Overview
@@ -55,7 +55,7 @@ The **UrbanVue3D Dashboard** is a comprehensive web application built using **Re
 
 ---
 
-## 7.2. Leaflet Page
+## 4.2. Leaflet Page
 ![leaflet](app-images/app2.png)
 
 
@@ -93,7 +93,7 @@ The **UrbanVue3D Dashboard** is a comprehensive web application built using **Re
 
 ---
 
-## 7.3. Mapbox Page
+## 4.3. Mapbox Page
 ![mapbox](app-images/app3.png)
 
 ### Overview
@@ -137,7 +137,7 @@ The **Mapbox page** provides an immersive **3D urban visualization**, built usin
 
 ---
 
-## 7.4. Papers Page
+## 4.4. Papers Page
 ![papers](app-images/app4.png)
 
 ### Overview
